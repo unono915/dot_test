@@ -1,11 +1,15 @@
 # 학교 정보자산 관리
 
-**개발 진행 중입니다. 아직 설치하거나 업무에 사용할 수 있는 완성 앱이 아닙니다.**
+**사용자 요청으로 클라우드 개발을 중단하고 Windows 개발 환경으로 인계합니다. 아직 설치하거나 업무에 사용할 수 있는 완성 앱이 아닙니다.**
 
 Windows 우선의 오프라인 단일 관리자용 Electron 프로그램을 개발합니다. 자산·사람·장소·IP 관리, 변경 이력, 실사, 검토형 엑셀 이관, 첨부, 백업·복원과 인계 자료가 목표입니다. LAN 스캔, 자동 수집, 클라우드 동기화, 원격 분석은 포함하지 않습니다.
 
 - [제품 명세 및 수용 기준 45개](docs/specs/school-asset-desktop-review.md)
 - [구현 계획과 검증 기준](docs/plans/school-asset-desktop-implementation-plan.md)
+- [Windows 개발 재개 안내](docs/WINDOWS_HANDOFF.md)
+- [Windows Codex에 붙여 넣을 프롬프트](docs/WINDOWS_CODEX_PROMPT.txt)
+
+Windows에서 저장소를 clone하여 승인된 설계에 따라 이어서 개발할 수 있습니다. 클라우드에서는 더 이상 구현을 진행하지 않습니다. 아래는 **소스·개발 도구 체크포인트**이며 앱/설치 파일/릴리스가 아닙니다. 전체 제품 수용 기준 45개는 모두 미실행입니다.
 
 ## 현재 체크포인트 — 2026-10-05
 
@@ -24,7 +28,7 @@ Windows 우선의 오프라인 단일 관리자용 Electron 프로그램을 개�
 
 ## 개발 도구 검증
 
-Node 24.x에서:
+Node 24.x (`>=24.19.0 <25`)와 npm에서 실행합니다. 공식 설치 출처, Windows 명령과 주의사항은 [인계 안내](docs/WINDOWS_HANDOFF.md)를 따릅니다.
 
 ```sh
 npm ci
