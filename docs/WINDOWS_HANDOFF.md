@@ -7,6 +7,16 @@
 저장소: [unono915/dot_test](https://github.com/unono915/dot_test), 인계 브랜치: `main`.
 Windows Codex에 [일반 텍스트 프롬프트](WINDOWS_CODEX_PROMPT.txt)를 붙여 넣으면 됩니다. 이전 개발 환경의 목표·실행 상태나 인증정보를 복사할 필요가 없습니다.
 
+## 0. Windows 진행 상황 (2026-10-06)
+
+Windows 11 Education x64에서 개발을 재개했습니다. 작업 브랜치는 `work/windows-foundation`입니다. 아래 §1–§3은 인계 당시(2026-10-05)의 기록이며, 현재 상태는 [README](../README.md)를 우선합니다.
+
+- 환경: 기존 시스템 Node가 22.16.0이라 요구 범위 밖이었습니다. nodejs.org 공식 Node 24.21.0 win-x64 zip을 SHA256 검증 후 사용자 폴더(`%LOCALAPPDATA%\node24`)에 두고 PATH 앞에 지정해 사용했습니다. 시스템 Node는 변경하지 않았습니다.
+- `npm ci`: better-sqlite3 13.0.3의 설치 스크립트(`node-gyp rebuild`)가 Visual Studio를 찾지 못해 처음에 실패했습니다. 사용자 승인 후 winget으로 Visual Studio 2022 Build Tools(C++ 워크로드)를 설치했습니다. npm 11.19의 `allowScripts` 정책이 설치 스크립트를 막아 `better-sqlite3`, `electron-winstaller`만 `package.json`의 `allowScripts`에 허용했습니다. 이후 `npm ci` 종료 코드 0.
+- 도구 검사: `check:sqlite:node`, `check:sqlite:electron` 각 1개 통과, 실패·건너뜀 0. 최소 Electron 진단 종료 코드 0, JSON 값 확인.
+- §4 첫 작업(안전한 앱 셸과 시험 기반) 구현: TypeScript(tsc: main/preload, Vite: renderer), Vitest 단위 시험, Playwright Electron E2E. 시험 먼저 작성 후 RED(모듈·앱 없음) 확인 → 구현 → GREEN. 주요 보호(새 창 차단, 권한 거부, 다운로드 차단, 네트워크 필터, IPC 발신자 검사, 단일 인스턴스)를 하나씩 무력화한 변이 6개는 모두 E2E에서 실패로 검출되었습니다.
+- 다음 작업: §5의 1번(업무 DB 스키마, 세대 카탈로그, 단일 writer, 명령 ID·기대 버전·epoch, 원자적 커밋).
+
 ## 1. 먼저 읽을 문서와 실제 파일
 
 1. [제품 명세와 수용 기준 45개](specs/school-asset-desktop-review.md)

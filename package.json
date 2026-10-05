@@ -4,7 +4,17 @@
   "private": true,
   "description": "오프라인 학교 정보자산 관리",
   "type": "module",
+  "main": "dist/main/main.js",
   "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:renderer": "vite build",
+    "build": "npm run clean && npm run build:main && npm run build:renderer",
+    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json && tsc -p tsconfig.test.json",
+    "start": "npm run build && electron .",
+    "test:unit": "vitest run",
+    "test:e2e": "npm run build && playwright test",
+    "test": "npm run test:unit && npm run test:e2e",
     "check:sqlite:node": "node --test tests/toolchain/sqlite-smoke.cjs",
     "check:sqlite:electron": "node scripts/check-electron-sqlite.cjs"
   },
@@ -33,5 +43,9 @@
     "typescript": "6.0.3",
     "vite": "8.3.2",
     "vitest": "5.0.3"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true,
+    "electron-winstaller@5.4.0": true
   }
 }

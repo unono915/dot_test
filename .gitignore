@@ -53,3 +53,7 @@ attachments/
 Thumbs.db
 core
 core.*
+
+# Claude Code / oh-my-claudecode local state
+.omc/
+.claude/
