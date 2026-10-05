@@ -1,0 +1,55 @@
+# Local orchestration, agent instructions and private working notes
+.omx*/
+.omx*
+.superpowers/
+.agents/
+.codex/
+.aws/
+AGENTS.md
+**/AGENTS.md
+docs/superpowers/
+
+# Credentials and machine-local configuration
+.env
+.env.*
+!.env.example
+.npmrc
+.yarnrc*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies, caches, build output and generated verification evidence
+node_modules/
+.cache/
+.npm/
+.electron/
+dist/
+dist-*/
+out/
+release/
+coverage/
+artifacts/
+test-results/
+playwright-report/
+*.log
+*.tsbuildinfo
+
+# Live data must never be published (synthetic source fixtures are separate)
+data/
+userData/
+backups/
+attachments/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+
+# Editor and OS debris
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+core
+core.*
