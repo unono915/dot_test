@@ -132,7 +132,7 @@ export function suggestMapping(target: ImportTarget, headers: string[]): Record<
   const norm = (s: string) => s.replace(/\s+/g, '').toLowerCase();
   const used = new Set<number>();
   for (const f of TARGETS[target].fields) {
-    const idx = headers.findIndex((h, i) => !used.has(i) && f.aliases.some((a) => norm(a) === norm(h)));
+    const idx = headers.findIndex((h, i) => !used.has(i) && [f.label, ...f.aliases].some((a) => norm(a) === norm(h)));
     if (idx >= 0) {
       out[f.key] = idx;
       used.add(idx);
