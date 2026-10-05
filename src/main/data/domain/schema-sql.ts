@@ -344,3 +344,32 @@ CREATE TABLE import_row_keys (
   PRIMARY KEY (source_namespace, row_key, entity_type)
 ) STRICT;
 `;
+
+export const ATTACHMENTS = `
+CREATE TABLE attachments (
+  id TEXT PRIMARY KEY,
+  sha256 TEXT NOT NULL CHECK (length(sha256) = 64),
+  size INTEGER NOT NULL CHECK (size > 0),
+  mime TEXT NOT NULL CHECK (mime IN ('application/pdf','image/png','image/jpeg','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')),
+  ext TEXT NOT NULL CHECK (ext IN ('pdf','png','jpg','xlsx')),
+  display_name TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  event_id TEXT NOT NULL
+) STRICT;
+CREATE INDEX attachments_by_hash ON attachments(sha256);
+CREATE TRIGGER attachments_immutable BEFORE UPDATE ON attachments BEGIN SELECT RAISE(ABORT, 'append-only'); END;
+CREATE TRIGGER attachments_no_delete BEFORE DELETE ON attachments BEGIN SELECT RAISE(ABORT, 'append-only'); END;
+
+CREATE TABLE attachment_links (
+  id TEXT PRIMARY KEY,
+  attachment_id TEXT NOT NULL REFERENCES attachments(id),
+  entity_type TEXT NOT NULL CHECK (entity_type IN ('asset','person','location','inventory','network')),
+  entity_id TEXT NOT NULL,
+  linked_at TEXT NOT NULL,
+  link_event_id TEXT NOT NULL,
+  unlinked_at TEXT,
+  unlink_event_id TEXT,
+  unlink_reason TEXT
+) STRICT;
+CREATE INDEX attachment_links_by_entity ON attachment_links(entity_type, entity_id);
+`;

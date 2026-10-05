@@ -1,5 +1,5 @@
 import { newId } from './ids.js';
-import { IMPORTS, INVENTORY, NETWORK, PEOPLE_LOCATIONS_ASSETS } from './domain/schema-sql.js';
+import { ATTACHMENTS, IMPORTS, INVENTORY, NETWORK, PEOPLE_LOCATIONS_ASSETS } from './domain/schema-sql.js';
 import type { Db } from './sqlite.js';
 
 // Dataset schema. The product is unreleased, so schema version 1 is still being completed;
@@ -48,7 +48,7 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value_json TEXT NOT NULL, version I
 `;
 
 /** Domain tables, added story by story. Order matters for foreign keys. */
-const DOMAIN: string[] = [PEOPLE_LOCATIONS_ASSETS, NETWORK, INVENTORY, IMPORTS];
+const DOMAIN: string[] = [PEOPLE_LOCATIONS_ASSETS, NETWORK, INVENTORY, IMPORTS, ATTACHMENTS];
 
 export function datasetSchemaSql(): string {
   return [CORE, ...DOMAIN].join('\n');
