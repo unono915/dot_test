@@ -10,13 +10,19 @@ export interface OpenOptions {
 /** Opens a SQLite file with the product's required safety PRAGMAs. */
 export function openDatabase(file: string, options: OpenOptions = {}): Db {
   const db = new Database(file, { readonly: options.readonly ?? false, fileMustExist: options.fileMustExist ?? false, timeout: 5000 });
-  db.pragma('foreign_keys = ON');
-  db.pragma('trusted_schema = OFF');
-  if (!options.readonly) {
-    db.pragma('journal_mode = WAL');
-    db.pragma('synchronous = FULL');
+  try {
+    db.pragma('foreign_keys = ON');
+    db.pragma('trusted_schema = OFF');
+    if (!options.readonly) {
+      db.pragma('journal_mode = WAL');
+      db.pragma('synchronous = FULL');
+    }
+    return db;
+  } catch (error) {
+    // A corrupt or foreign file must not stay open (Windows would keep it locked).
+    db.close();
+    throw error;
   }
-  return db;
 }
 
 export function pragmaSnapshot(db: Db) {

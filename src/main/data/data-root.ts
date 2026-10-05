@@ -3,7 +3,9 @@ import { acquireDataRootLock, type DataRootLock } from '../data-root-lock.js';
 import { Catalog } from './catalog.js';
 import type { CommandRegistry } from './commands.js';
 import { DatasetStore, createDatasetFile, type FaultInjector } from './dataset.js';
+import { checkDatasetInvariants } from './domain/invariants.js';
 import { newId } from './ids.js';
+import { openDatabase } from './sqlite.js';
 
 export interface DataRootOptions {
   registry: CommandRegistry;
@@ -32,6 +34,7 @@ export class DataRoot {
     let catalog: Catalog | null = null;
     try {
       catalog = Catalog.open(dir, now);
+      recoverInterruptedSwitches(catalog);
       recoverInterruptedGenerations(catalog);
       let active = catalog.active();
       if (!active) {
@@ -92,6 +95,48 @@ function recoverInterruptedGenerations(catalog: Catalog): void {
       catalog.setState(gen.id, 'discarded');
       catalog.journal({ jobId: newId(), kind: 'recovery', step: 'discard-unfinished-generation', status: 'done', generationId: gen.id });
       fs.rmSync(catalog.generationDir(gen.id), { recursive: true, force: true });
+    }
+  }
+}
+
+/**
+ * A restore/rollback that crashed after switching the pointer but before finishing: keep the new
+ * generation if it opens and passes the checks, otherwise return to the previous generation.
+ * Either way a fresh epoch is in force (the switch itself issued one; a revert issues another).
+ */
+function recoverInterruptedSwitches(catalog: Catalog): void {
+  const byJob = new Map<string, { kind: string; steps: string[]; generationId: string | null; previous: string | null }>();
+  for (const j of catalog.journalEntries()) {
+    if (j.kind !== 'restore' && j.kind !== 'rollback') continue;
+    const cur = byJob.get(j.jobId) ?? { kind: j.kind, steps: [], generationId: null, previous: null };
+    cur.steps.push(j.step);
+    if (j.step === 'switched') {
+      cur.generationId = j.generationId;
+      cur.previous = (j.detail.previous as string | undefined) ?? null;
+    }
+    byJob.set(j.jobId, cur);
+  }
+  for (const [jobId, job] of byJob) {
+    if (!job.steps.includes('switched') || job.steps.includes('done') || job.steps.includes('reverted')) continue;
+    const active = catalog.active();
+    if (!active || active.generationId !== job.generationId || !job.previous) continue;
+    let healthy = false;
+    try {
+      const db = openDatabase(catalog.datasetFile(active.generationId), { fileMustExist: true });
+      try {
+        healthy = checkDatasetInvariants(db).length === 0;
+      } finally {
+        db.close();
+      }
+    } catch {
+      healthy = false;
+    }
+    if (healthy) {
+      catalog.journal({ jobId, kind: job.kind, step: 'done', status: 'done', generationId: active.generationId, detail: { recovered: true } });
+    } else {
+      catalog.activate(job.previous);
+      catalog.setState(active.generationId, 'discarded');
+      catalog.journal({ jobId, kind: job.kind, step: 'reverted', status: 'failed', generationId: job.previous, detail: { reason: 'recovery_open_failed', failedGeneration: active.generationId } });
     }
   }
 }
