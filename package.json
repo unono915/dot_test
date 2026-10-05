@@ -12,7 +12,7 @@
     "build": "npm run clean && npm run build:main && npm run build:renderer",
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json && tsc -p tsconfig.test.json",
     "start": "npm run build && electron .",
-    "test:unit": "vitest run",
+    "test:unit": "tsc -p tsconfig.main.json && vitest run",
     "test:e2e": "npm run build && playwright test",
     "test": "npm run test:unit && npm run test:e2e",
     "check:sqlite:node": "node --test tests/toolchain/sqlite-smoke.cjs",
