@@ -16,7 +16,8 @@
     "test:e2e": "npm run build && playwright test",
     "test": "npm run test:unit && npm run test:e2e",
     "check:sqlite:node": "node --test tests/toolchain/sqlite-smoke.cjs",
-    "check:sqlite:electron": "node scripts/check-electron-sqlite.cjs"
+    "check:sqlite:electron": "node scripts/check-electron-sqlite.cjs",
+    "test:perf": "tsc -p tsconfig.main.json && vitest run --config vitest.perf.config.ts"
   },
   "engines": {
     "node": ">=24.19.0 <25"

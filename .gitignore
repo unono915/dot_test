@@ -37,10 +37,11 @@ playwright-report/
 *.tsbuildinfo
 
 # Live data must never be published (synthetic source fixtures are separate)
-data/
-userData/
-backups/
-attachments/
+# (root-anchored so source folders such as src/main/data are not ignored)
+/data/
+/userData/
+/backups/
+/attachments/
 *.sqlite
 *.sqlite-*
 *.db
